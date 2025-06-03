@@ -1,5 +1,5 @@
 {
-  "name": "cloud-vault",
+  "name": "cloudvault",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -12,6 +12,8 @@
   "dependencies": {
     "@prisma/client": "^6.8.2",
     "@supabase/supabase-js": "^2.49.4",
+    "@types/express": "^5.0.2",
+    "@types/node": "^22.15.29",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -21,7 +23,10 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.2",
     "nodemon": "^3.1.9",
-    "pg": "^8.13.2"
+    "pg": "^8.13.2",
+    "ts-migrate": "^0.1.35",
+    "tsc": "^2.0.4",
+    "typescript": "^5.8.3"
   },
   "devDependencies": {
     "prisma": "^6.8.2"

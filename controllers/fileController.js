@@ -3,10 +3,10 @@ const supabase = require("../config/supabase");
 const Supabase = require("../prisma/queries/Supabase");
 
 // upload file form
-exports.getUpload = (req, res) => {
-  const { folderId } = req.params;
-  // res.render("fileForm", { title: "Upload Files", folderId: folderId });
-};
+// exports.getUpload = (req, res) => {
+//   const { folderId } = req.params;
+//   // res.render("fileForm", { title: "Upload Files", folderId: folderId });
+// };
 
 exports.postUpload = async (req, res) => {
   const { folderId } = req.params;
