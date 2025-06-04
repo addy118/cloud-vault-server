@@ -1,6 +1,6 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import db from "../../config/prismaClient";
-import { FileDB } from "./folder.types";
+import { FileDB } from "../../types/folder.types";
 
 class File {
   static async create(

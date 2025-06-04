@@ -6,21 +6,15 @@ import jwt from "jsonwebtoken";
 import User from "../prisma/queries/User";
 import Folder from "../prisma/queries/Folder";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
-import { RootUser } from "prisma/queries/user.types";
-import {
-  AuthRequest,
-  LoginRes,
-  MsgBody,
-  MsgRes,
-  SignupRes,
-  TokenRes,
-  Tokens,
-  UserWithTokenRes,
-} from "./controller.types";
+import { RootUser } from "../types/user.types";
+import { Tokens } from "../types/controller.types";
 const { ACCESS_TOKEN, REFRESH_TOKEN } = process.env;
 const isProd = false;
 
-export const postSignup = async (req: Request, res: Response): SignupRes => {
+export const postSignup = async (
+  req: Request,
+  res: Response,
+): Promise<void | undefined> => {
   const { name, username, email, password } = req.body;
 
   try {
@@ -37,7 +31,7 @@ export const postSignup = async (req: Request, res: Response): SignupRes => {
       error instanceof PrismaClientKnownRequestError &&
       error.code === "P2002"
     ) {
-      return res.status(400).json({
+      res.status(400).json({
         msg: "Email, Phone or Username already exists. Please choose a different one.",
       });
     }
@@ -49,7 +43,10 @@ export const postSignup = async (req: Request, res: Response): SignupRes => {
   }
 };
 
-export const postLogin = async (req: Request, res: Response): LoginRes => {
+export const postLogin = async (
+  req: Request,
+  res: Response,
+): Promise<void | undefined> => {
   const { data, password } = req.body;
 
   try {
@@ -78,7 +75,9 @@ export const postLogin = async (req: Request, res: Response): LoginRes => {
       throw new Error("Couldn't load ACCESS_TOKEN from .env file.");
     const decoded = jwt.verify(accessToken, ACCESS_TOKEN);
 
-    return res.json({ msg: "Login Successful!", accessToken, user: decoded });
+    res
+      .status(200)
+      .json({ msg: "Login Successful!", accessToken, user: decoded });
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error("Error during login: ", error.stack);
@@ -87,7 +86,10 @@ export const postLogin = async (req: Request, res: Response): LoginRes => {
   }
 };
 
-export const postLogout = async (req: Request, res: Response): MsgRes => {
+export const postLogout = async (
+  req: Request,
+  res: Response,
+): Promise<void | undefined> => {
   try {
     // remove the cookie from client's browser
     res.clearCookie("refreshCookie", {
@@ -96,11 +98,11 @@ export const postLogout = async (req: Request, res: Response): MsgRes => {
       sameSite: isProd ? "none" : "lax",
     });
 
-    return res.status(200).json({ msg: "Logged out successfully" });
+    res.status(200).json({ msg: "Logged out successfully" });
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error("Error during logout: ", error.stack);
-      return res.status(500).json({ msg: "Logout failed. Please try again." });
+      res.status(500).json({ msg: "Logout failed. Please try again." });
     }
   }
 };
@@ -108,7 +110,7 @@ export const postLogout = async (req: Request, res: Response): MsgRes => {
 export const getToken = async (
   req: Request,
   res: Response,
-): UserWithTokenRes => {
+): Promise<void | undefined> => {
   const bearerHeader = req.headers["authorization"];
   const accessToken = bearerHeader && bearerHeader.split(" ")[1];
   if (!accessToken) throw new Error("Invalid access token.");
@@ -118,7 +120,7 @@ export const getToken = async (
       throw new Error("Couldn't load ACCESS_TOKEN from .env file.");
     const decoded = jwt.verify(accessToken, ACCESS_TOKEN);
 
-    return res.json({ accessToken, user: decoded });
+    res.json({ accessToken, user: decoded });
   } catch (err: unknown) {
     if (err instanceof Error) {
       console.error("Error verifying token: ", err.stack);
@@ -129,13 +131,13 @@ export const getToken = async (
 
 // attach user obj to req obj
 export const verifyToken = (
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
-): Response<string> | undefined => {
+): void => {
   const bearerHeader = req.headers["authorization"];
   const accessToken = bearerHeader && bearerHeader.split(" ")[1];
-  if (!accessToken) return res.status(500).send("Unauthorized access!");
+  if (!accessToken) throw new Error("Unauthorized access!");
 
   try {
     if (!ACCESS_TOKEN)
@@ -149,12 +151,15 @@ export const verifyToken = (
   } catch (err: unknown) {
     if (err instanceof Error) {
       console.error("Error verifying access token: ", err.stack);
-      return res.status(403).json({ msg: "Invalid or expired token" });
+      res.status(403).json({ msg: "Invalid or expired token" });
     }
   }
 };
 
-export const refresh = async (req: Request, res: Response): TokenRes => {
+export const refresh = async (
+  req: Request,
+  res: Response,
+): Promise<void | undefined> => {
   const refreshCookie = req.cookies.refreshCookie;
   if (!refreshCookie) throw new Error("Unauthorized: No Token Found");
 
@@ -183,24 +188,25 @@ export const refresh = async (req: Request, res: Response): TokenRes => {
     });
 
     // send accessToken in response
-    return res.json({ msg: "Tokens Regenerated", accessToken });
+    res.json({ msg: "Tokens Regenerated", accessToken });
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error("Error refreshing token: ", error.stack);
-      return res.status(403).json({ msg: "Invalid or expired refresh token" });
+      res.status(403).json({ msg: "Invalid or expired refresh token" });
     }
   }
 };
 
 export const verifyOwnership = (
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
-): Response<MsgBody> | undefined => {
+): void => {
   const userId = Number(req.params.userId);
 
+  if (!req.user) throw new Error("Unauthorized access.");
   if (userId !== req.user.id) {
-    return res.status(403).json({ msg: "You don't have access rights" });
+    res.status(403).json({ msg: "You don't have access rights" });
   }
   next();
 };
@@ -227,5 +233,8 @@ const generateTokens = (user: RootUser): Tokens => {
     expiresIn: "10d",
   });
 
-  return { accessToken, refreshToken };
+  return {
+    accessToken,
+    refreshToken,
+  };
 };

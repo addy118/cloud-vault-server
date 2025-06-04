@@ -5,7 +5,7 @@ import {
   CompleteUser,
   CompleteUserDB,
   BaseUser,
-} from "./user.types";
+} from "types/user.types";
 
 class User {
   static async create(

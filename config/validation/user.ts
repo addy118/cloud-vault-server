@@ -32,7 +32,7 @@ const validateSignup = [
     .withMessage("Password must contain at least one number")
     .matches(/[@$!%*?&]/)
     .withMessage(
-      "Password must contain at least one special character (@$!%*?&)"
+      "Password must contain at least one special character (@$!%*?&)",
     ),
 ];
 
@@ -53,7 +53,7 @@ const validateLogin = [
     .withMessage("Password must contain at least one number")
     .matches(/[@$!%*?&]/)
     .withMessage(
-      "Password must contain at least one special character (@$!%*?&)"
+      "Password must contain at least one special character (@$!%*?&)",
     ),
 ];
 
@@ -96,7 +96,7 @@ const validatePass = [
     .withMessage("Password must contain at least one number")
     .matches(/[@$!%*?&]/)
     .withMessage(
-      "Password must contain at least one special character (@$!%*?&)"
+      "Password must contain at least one special character (@$!%*?&)",
     ),
 ];
 

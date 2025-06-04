@@ -2,14 +2,17 @@ import File from "../prisma/queries/File";
 import supabase from "../config/supabase";
 import Supabase from "../prisma/queries/Supabase";
 import { Request, Response } from "express";
-import { FileCore, MsgRes } from "./controller.types";
+import { FileCore } from "../types/controller.types";
 
-export const postUpload = async (req: Request, res: Response): MsgRes => {
+export const postUpload = async (
+  req: Request,
+  res: Response,
+): Promise<void | undefined> => {
   const { folderId } = req.params;
   const { userId } = req.body;
 
   if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ msg: "No files uploaded!" });
+    res.status(400).json({ msg: "No files uploaded!" });
   }
 
   try {
@@ -74,7 +77,10 @@ export const postUpload = async (req: Request, res: Response): MsgRes => {
   }
 };
 
-export const postDownloadFile = async (req: Request, res: Response): MsgRes => {
+export const postDownloadFile = async (
+  req: Request,
+  res: Response,
+): Promise<void | undefined> => {
   const { userId, folderId, fileId } = req.params;
 
   try {
@@ -88,7 +94,7 @@ export const postDownloadFile = async (req: Request, res: Response): MsgRes => {
 
     if (error) {
       console.error("Error downloading file:", error.message);
-      return res.status(500).json({ msg: "Failed to download file." });
+      throw new Error("Failed to download file.");
     }
 
     res.setHeader("Content-Type", data.type);
@@ -115,7 +121,10 @@ export const postDownloadFile = async (req: Request, res: Response): MsgRes => {
   }
 };
 
-export const postDeleteFile = async (req: Request, res: Response): MsgRes => {
+export const postDeleteFile = async (
+  req: Request,
+  res: Response,
+): Promise<void | undefined> => {
   const fileId = Number(req.params.fileId);
   const { userId } = req.body;
 
@@ -123,14 +132,12 @@ export const postDeleteFile = async (req: Request, res: Response): MsgRes => {
     await Supabase.removeFile(fileId, userId);
     await File.deleteById(fileId);
 
-    return res.json({ msg: "File deleted successfully!" });
+    res.json({ msg: "File deleted successfully!" });
   } catch (err: unknown) {
     if (err instanceof Error) {
       console.error("Error: ", err.message);
       console.error("Stack: ", err.stack);
-      return res
-        .status(500)
-        .json({ msg: `Failed to remove files: ${err.message}` });
+      res.status(500).json({ msg: `Failed to remove files: ${err.message}` });
     }
   }
 };

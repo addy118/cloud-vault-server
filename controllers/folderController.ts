@@ -1,14 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import Folder from "../prisma/queries/Folder";
 import Supabase from "../prisma/queries/Supabase";
-import { AppError, FolderRes, MsgBody, MsgRes } from "./controller.types";
-import { CompleteFolder } from "prisma/queries/folder.types";
+import { AppError } from "../types/controller.types";
 
 export const getFolder = async (
   req: Request,
   res: Response,
   next: NextFunction,
-): FolderRes => {
+): Promise<void | undefined> => {
   const { folderId } = req.params;
   const folderDetails = await Folder.getItemsById(Number(folderId));
 
@@ -18,17 +17,20 @@ export const getFolder = async (
     next(err);
   }
 
-  return res.json(folderDetails);
+  res.json(folderDetails);
 };
 
-export const postNewFolder = async (req: Request, res: Response): MsgRes => {
+export const postNewFolder = async (
+  req: Request,
+  res: Response,
+): Promise<void | undefined> => {
   try {
     const { folderId } = req.params;
     const { folderName, userId } = req.body;
 
     await Folder.create(folderName, Number(folderId), userId);
 
-    return res.json({ msg: "Folder created successfully!" });
+    res.json({ msg: "Folder created successfully!" });
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ msg: error.message });
@@ -36,7 +38,10 @@ export const postNewFolder = async (req: Request, res: Response): MsgRes => {
   }
 };
 
-export const postDeleteFolder = async (req: Request, res: Response): MsgRes => {
+export const postDeleteFolder = async (
+  req: Request,
+  res: Response,
+): Promise<void | undefined> => {
   const folderId = Number(req.params.folderId);
   const userId = Number(req.body);
 
@@ -44,14 +49,12 @@ export const postDeleteFolder = async (req: Request, res: Response): MsgRes => {
     await Supabase.removeFolder(folderId, userId);
     await Folder.deleteById(folderId);
 
-    return res.json({ msg: "Folder deleted successfully!" });
+    res.json({ msg: "Folder deleted successfully!" });
   } catch (err: unknown) {
     if (err instanceof Error) {
       console.error("Error deleting the folder: ", err.message);
       console.error("Stack: ", err.stack);
-      return res
-        .status(500)
-        .json({ msg: "Failed to remove folder and its files." });
+      res.status(500).json({ msg: "Failed to remove folder and its files." });
     }
   }
 };
@@ -61,7 +64,7 @@ export const appError = (
   req: Request,
   res: Response,
   next: any,
-): Response<MsgBody> => {
+): void => {
   console.error(err.stack);
-  return res.status(err.status || 500).json({ msg: err.message });
+  res.status(err.status || 500).json({ msg: err.message });
 };

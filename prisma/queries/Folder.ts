@@ -1,6 +1,6 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import db from "../../config/prismaClient";
-import { FolderDB, CompleteFolder } from "./folder.types";
+import { FolderDB, CompleteFolder } from "../../types/folder.types";
 
 class Folder {
   static async create(

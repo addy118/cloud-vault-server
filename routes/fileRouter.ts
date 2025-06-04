@@ -1,22 +1,15 @@
-
-const { Router } = require("express");
-const {
-  getUpload,
+import { Router } from "express";
+import {
   postUpload,
   postDeleteFile,
   postDownloadFile,
-
-} = require("../controllers/fileController");
-
+} from "../controllers/fileController";
 const { uploadFiles, multerError } = require("../config/multer");
-
 const fileRouter = Router();
-
 
 fileRouter.post("/:folderId", uploadFiles, multerError, postUpload);
 fileRouter.post("/:userId/:folderId/:fileId/download", postDownloadFile);
 
 fileRouter.delete("/:fileId", postDeleteFile);
 
-
-module.exports = fileRouter;
+export default fileRouter;

@@ -1,5 +1,5 @@
+import { UserDB } from "types/user.types";
 import db from "../config/prismaClient";
-import { UserDB } from "./queries/user.types";
 
 const users = [
   // the password is Hello@18
