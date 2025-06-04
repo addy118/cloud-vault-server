@@ -1,4 +1,4 @@
-import { UserDB } from "types/user.types";
+import { UserDB } from "../types/user.types";
 import db from "../config/prismaClient";
 
 const users = [
