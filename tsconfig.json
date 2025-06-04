@@ -8,11 +8,11 @@
     "resolveJsonModule": true,
     "moduleDetection": "force",
     "isolatedModules": true,
-    "target": "es2022",
+    "target": "esnext",
     "moduleResolution": "nodenext",
     "module": "nodenext",
     "baseUrl": "./",
-    "outDir": "dist",
+    "outDir": "dist/",
     "rootDir": "./",
     "removeComments": true,
     "forceConsistentCasingInFileNames": true,
@@ -25,9 +25,32 @@
     /* If transpiling with TypeScript: */
     "sourceMap": true,
 
-    /* If your code doesn't run in the DOM: */
-    "lib": ["es2023"]
+    "typeRoots": ["./node_modules/@types"],
+    "useUnknownInCatchVariables": true
   },
   "include": ["./**/*"],
   "exclude": ["node_modules", "dist"]
 }
+
+// {
+//   "$schema": "https://json.schemastore.org/tsconfig",
+//   "_version": "20.1.0",
+
+//   "compilerOptions": {
+//     "lib": ["es2023"],
+//     "module": "nodenext",
+//     "target": "es2020",
+//     "moduleResolution": "node16",
+
+//     "strict": true,
+//     "esModuleInterop": true,
+//     "allowSyntheticDefaultImports": true,
+//     "skipLibCheck": true,
+//     "forceConsistentCasingInFileNames": true,
+
+//     "declaration": true,
+//     "declarationMap": true,
+//     "sourceMap": true
+//   },
+//   "exclude": ["node_modules", "dist"]
+// }

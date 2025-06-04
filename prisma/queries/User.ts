@@ -1,51 +1,89 @@
-// @ts-expect-error TS(2451): Cannot redeclare block-scoped variable 'db'.
-const db = require("../../config/prismaClient");
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
+import db from "../../config/prismaClient";
+import {
+  UserDB,
+  CompleteUser,
+  CompleteUserDB,
+  BaseUser,
+} from "./user.types";
 
-// @ts-expect-error TS(2451): Cannot redeclare block-scoped variable 'User'.
 class User {
-  static async create(name: any, username: any, email: any, password: any) {
+  static async create(
+    name: string,
+    username: string,
+    email: string,
+    password: string,
+  ): Promise<UserDB | undefined> {
     try {
       const user = await db.user.create({
         data: { name, username, email, password },
       });
       return user;
-    } catch (error) {
-      // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
-      console.error("Error creating user: ", error.stack);
-      // @ts-expect-error TS(2571): Object is of type 'unknown'.
-      if (error.code === "P2002") {
-        // Handling unique constraint violation
-        // @ts-expect-error TS(2304): Cannot find name 'Error'.
-        throw new Error();
-        // "A user with this email, phone or username already exists."
+    } catch (error: unknown) {
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        throw new Error(
+          "A user with this email, phone or username already exists.",
+        );
       }
-      // @ts-expect-error TS(2304): Cannot find name 'Error'.
-      throw new Error("Failed to create user.");
+
+      if (error instanceof Error) {
+        console.error("Error creating user: ", error.stack);
+        throw new Error(error.message);
+      }
     }
   }
 
-  static async getBasicInfo(id: any) {
+  static async getBasicInfo(id: number): Promise<BaseUser | undefined> {
     try {
-      return await db.user.findUnique({
-        // @ts-expect-error TS(2304): Cannot find name 'Number'.
-        where: { id: Number(id) },
+      const user = await db.user.findUnique({
+        where: { id },
         select: {
           id: true,
           name: true,
           username: true,
           email: true,
-          // phone: true,
         },
       });
-    } catch (error) {
-      // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
-      console.error("Error fetching user info: ", error.stack);
-      // @ts-expect-error TS(2304): Cannot find name 'Error'.
-      throw new Error("Failed to fetch user info.");
+
+      if (!user) throw new Error("User not found.");
+      return user;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error fetching user info: ", error.stack);
+        throw new Error(error.message);
+      }
     }
   }
 
-  static async get(data: any) {
+  static async getById(id: number): Promise<CompleteUser | undefined> {
+    try {
+      const user = await db.user.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          email: true,
+          createdAt: true,
+          folders: true,
+          files: true,
+        },
+      });
+
+      if (!user) throw new Error("No user found.");
+      return user;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error fetching user by ID: ", error.stack);
+        throw new Error(error.message);
+      }
+    }
+  }
+
+  static async get(data: string): Promise<CompleteUserDB | undefined> {
     try {
       const user = await db.user.findFirst({
         where: {
@@ -55,7 +93,6 @@ class User {
           id: true,
           name: true,
           username: true,
-          // phone: true,
           email: true,
           password: true,
           createdAt: true,
@@ -63,157 +100,133 @@ class User {
           folders: true,
         },
       });
+
+      if (!user) throw new Error("No user found.");
       return user;
-    } catch (error) {
-      // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
-      console.error("Error fetching user by email/username: ", error.stack);
-      // @ts-expect-error TS(2304): Cannot find name 'Error'.
-      throw new Error("Failed to fetch user by email/username.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error fetching user by email/username: ", error.stack);
+        throw new Error(error.message);
+      }
     }
   }
 
-  static async getById(id: any) {
-    try {
-      const user = await db.user.findUnique({
-        where: { id },
-        select: {
-          id: true,
-          name: true,
-          username: true,
-          // phone: true,
-          email: true,
-          createdAt: true,
-          folders: true,
-          files: true,
-        },
-      });
-      return user;
-    } catch (error) {
-      // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
-      console.error("Error fetching user by ID: ", error.stack);
-      // @ts-expect-error TS(2304): Cannot find name 'Error'.
-      throw new Error("Failed to fetch user by ID.");
-    }
-  }
-
-  static async getNameById(id: any) {
+  static async getNameById(id: number): Promise<string | undefined> {
     try {
       const user = await db.user.findUnique({
         where: { id },
         select: { name: true },
       });
+
+      if (!user) throw new Error("No user found with given name.");
       return user.name;
-    } catch (error) {
-      // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
-      console.error("Error fetching name by ID: ", error.stack);
-      // @ts-expect-error TS(2304): Cannot find name 'Error'.
-      throw new Error("Failed to fetch name by ID.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error fetching name by ID: ", error.stack);
+        throw new Error(error.message);
+      }
     }
   }
 
-  static async getIdbyUserName(username: any) {
+  static async getIdbyUserName(username: string): Promise<Number | undefined> {
     try {
       const userId = await db.user.findFirst({
         where: { username },
         select: { id: true },
       });
-      // @ts-expect-error TS(2304): Cannot find name 'Number'.
-      return Number(userId.id);
-    } catch (error) {
-      // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
-      console.error("Error fetching ID by username: ", error.stack);
-      // @ts-expect-error TS(2304): Cannot find name 'Error'.
-      throw new Error("Failed to fetch ID by username.");
+
+      if (!userId) throw new Error("No user ID found with given username");
+      return userId.id;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error fetching user ID by username: ", error.stack);
+        throw new Error(error.message);
+      }
     }
   }
 
-  static async changeEmail(userId: any, email: any) {
+  static async changeEmail(userId: number, email: string): Promise<void> {
     try {
       await db.user.update({
         where: { id: userId },
         data: { email },
       });
-    } catch (error) {
-      // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
-      console.error("Error changing email: ", error.stack);
-      // @ts-expect-error TS(2571): Object is of type 'unknown'.
-      if (error.code === "P2002") {
-        // Handling unique constraint violation
-        // @ts-expect-error TS(2304): Cannot find name 'Error'.
-        throw new Error("Email is already taken.");
+    } catch (error: unknown) {
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        throw new Error("A user with this email already exists.");
       }
-      // @ts-expect-error TS(2304): Cannot find name 'Error'.
-      throw new Error("Failed to update user's email.");
+
+      if (error instanceof Error) {
+        console.error("Error updating email: ", error.stack);
+        throw new Error(error.message);
+      }
     }
   }
 
-  static async changeName(userId: any, name: any) {
+  static async changeName(userId: number, name: string): Promise<void> {
     try {
       await db.user.update({
         where: { id: userId },
         data: { name },
       });
-    } catch (error) {
-      // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
-      console.error("Error updating name: ", error.stack);
-      // @ts-expect-error TS(2304): Cannot find name 'Error'.
-      throw new Error("Failed to update user's name.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error fetching updating name: ", error.stack);
+        throw new Error(error.message);
+      }
     }
   }
 
-  static async changeUserName(userId: any, username: any) {
+  static async changeUserName(userId: number, username: string): Promise<void> {
     try {
       await db.user.update({
         where: { id: userId },
         data: { username },
       });
-    } catch (error) {
-      // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
-      console.error("Error updating username: ", error.stack);
-      // @ts-expect-error TS(2304): Cannot find name 'Error'.
-      throw new Error("Failed to update user's username.");
+    } catch (error: unknown) {
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        throw new Error("A user with this email already exists.");
+      }
+
+      if (error instanceof Error) {
+        console.error("Error updating email: ", error.stack);
+        throw new Error(error.message);
+      }
     }
   }
 
-  // static async changePhone(userId, phone) {
-  //   try {
-  //     await db.user.update({
-  //       where: { id: User },
-  //       data: { phone },
-  //     });
-  //   } catch (error) {
-  //     console.error("Error updating name: ", error.stack);
-  //     throw new Error("Failed to update user's phone.");
-  //   }
-  // }
-
-  static async changePass(userId: any, password: any) {
+  static async changePass(userId: number, password: string): Promise<void> {
     try {
       await db.user.update({
         where: { id: userId },
         data: { password },
       });
-    } catch (error) {
-      // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
-      console.error("Error updating password: ", error.stack);
-      // @ts-expect-error TS(2304): Cannot find name 'Error'.
-      throw new Error("Failed to update user password.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error updating password: ", error.stack);
+        throw new Error(error.message);
+      }
     }
   }
 
-  static async delete(userId: any) {
+  static async delete(userId: number): Promise<void> {
     try {
       await db.user.delete({
         where: { id: userId },
       });
-    } catch (error) {
-      // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
-      console.error("Error deleting user: ", error.stack);
-      // @ts-expect-error TS(2304): Cannot find name 'Error'.
-      throw new Error("Failed to delete user.");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error deleting user: ", error.stack);
+        throw new Error(error.message);
+      }
     }
   }
 }
 
-// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = User;
+export default User;

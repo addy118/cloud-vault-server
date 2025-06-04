@@ -1,13 +1,10 @@
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-require("dotenv").config();
-// @ts-expect-error TS(2451): Cannot redeclare block-scoped variable 'bcrypt'.
-const bcrypt = require("bcryptjs");
-// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-const jwt = require("jsonwebtoken");
-// @ts-expect-error TS(2451): Cannot redeclare block-scoped variable 'User'.
-const User = require("../prisma/queries/User");
-// @ts-expect-error TS(2451): Cannot redeclare block-scoped variable 'Folder'.
-const Folder = require("../prisma/queries/Folder");
+import { config } from "dotenv";
+config({ path: "../.env" });
+import { NextFunction, Request, Response, ErrorRequestHandler } from "express";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import User from "../prisma/queries/User";
+import Folder from "../prisma/queries/Folder";
 const {
   ACCESS_TOKEN,
   REFRESH_TOKEN,
@@ -15,24 +12,15 @@ const {
   SAME_SITE_DEV,
   SECURE_PROD,
   SAME_SITE_PROD,
-// @ts-expect-error TS(2580): Cannot find name 'process'. Do you need to install... Remove this comment to see the full error message
 } = process.env;
 
-// @ts-expect-error TS(2304): Cannot find name 'exports'.
-exports.postSignup = async (req: any, res: any) => {
+export const postSignup = async (req: Request, res: Response) => {
   const { name, username, email, password } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create(
-      name,
-      username,
-      // phone,
-      email,
-      hashedPassword
-    );
+    const user = await User.create(name, username, email, hashedPassword);
 
-    // @ts-expect-error TS(2304): Cannot find name 'Number'.
     const root = await Folder.createRoot(Number(user.id));
 
     res.status(200).json({ ...user, rootId: root.id });
@@ -51,7 +39,7 @@ exports.postSignup = async (req: any, res: any) => {
 
 // TOGGLE PROD/DEV CONFIG
 // @ts-expect-error TS(2304): Cannot find name 'exports'.
-exports.postLogin = async (req: any, res: any) => {
+export const postLogin = async (req: Request, res: Response) => {
   const { data, password } = req.body;
 
   try {
@@ -86,7 +74,7 @@ exports.postLogin = async (req: any, res: any) => {
 
 // TOGGLE PROD/DEV CONFIG
 // @ts-expect-error TS(2304): Cannot find name 'exports'.
-exports.postLogout = async (req: any, res: any) => {
+export const postLogout = async (req: Request, res: Response) => {
   try {
     res.clearCookie("refreshCookie", {
       httpOnly: true,
@@ -102,7 +90,7 @@ exports.postLogout = async (req: any, res: any) => {
 };
 
 // @ts-expect-error TS(2304): Cannot find name 'exports'.
-exports.getToken = async (req: any, res: any) => {
+export const getToken = async (req: Request, res: Response) => {
   const bearerHeader = req.headers["authorization"];
   const accessToken = bearerHeader && bearerHeader.split(" ")[1];
   if (!accessToken)
@@ -119,7 +107,7 @@ exports.getToken = async (req: any, res: any) => {
 };
 
 // @ts-expect-error TS(2304): Cannot find name 'exports'.
-exports.verifyToken = (req: any, res: any, next: any) => {
+export const verifyToken = (req: any, res: any, next: any) => {
   const bearerHeader = req.headers["authorization"];
   const accessToken = bearerHeader && bearerHeader.split(" ")[1];
   if (!accessToken) return res.status(500).send("Unauthorized access!");
@@ -136,7 +124,7 @@ exports.verifyToken = (req: any, res: any, next: any) => {
 };
 
 // @ts-expect-error TS(2304): Cannot find name 'exports'.
-exports.refresh = async (req: any, res: any) => {
+export const refresh = async (req: Request, res: Response) => {
   const refreshCookie = req.cookies.refreshCookie;
 
   if (!refreshCookie) {
@@ -173,7 +161,7 @@ exports.refresh = async (req: any, res: any) => {
 };
 
 // @ts-expect-error TS(2304): Cannot find name 'exports'.
-exports.verifyOwnership = (req: any, res: any, next: any) => {
+export const verifyOwnership = (req: any, res: any, next: any) => {
   // @ts-expect-error TS(2304): Cannot find name 'Number'.
   const userId = Number(req.params.userId);
   if (userId !== req.user.id) {
@@ -195,7 +183,7 @@ const generateTokens = (user: any) => {
       createdAt: user.createdAt,
     },
     ACCESS_TOKEN,
-    { expiresIn: "10m" }
+    { expiresIn: "10m" },
   );
   // console.log(accessToken);
 
