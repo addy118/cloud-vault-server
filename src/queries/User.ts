@@ -1,11 +1,11 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
-import db from "../../config/prismaClient";
+import db from "../config/prismaClient";
 import {
   UserDB,
   CompleteUser,
   CompleteUserDB,
   BaseUser,
-} from "../../types/user.types";
+} from "../types/user.types";
 
 class User {
   static async create(

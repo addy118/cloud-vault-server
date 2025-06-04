@@ -4,7 +4,6 @@
     /* Base Options: */
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "allowJs": true,
     "resolveJsonModule": true,
     "moduleDetection": "force",
     "isolatedModules": true,
@@ -12,8 +11,8 @@
     "moduleResolution": "nodenext",
     "module": "nodenext",
     "baseUrl": "./",
-    "outDir": "dist/",
-    "rootDir": "./",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "removeComments": true,
     "forceConsistentCasingInFileNames": true,
 
@@ -26,8 +25,9 @@
     "sourceMap": true,
 
     "useUnknownInCatchVariables": true,
-    "typeRoots": ["./node_modules/@types", "./types"]
+    "typeRoots": ["src/types", "./node_modules/@types"],
+    "types": ["node", "express"]
   },
-  "include": ["./**/*"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
   "exclude": ["node_modules", "dist"]
 }

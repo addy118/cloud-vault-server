@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import Folder from "../prisma/queries/Folder";
-import Supabase from "../prisma/queries/Supabase";
+import Folder from "../queries/Folder";
+import Supabase from "../queries/Supabase";
 import { AppError } from "../types/controller.types";
 
 export const getFolder = async (

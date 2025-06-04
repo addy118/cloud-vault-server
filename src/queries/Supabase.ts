@@ -1,7 +1,7 @@
-import supabase from "../../config/supabase";
+import supabase from "../config/supabase";
 import File from "./File";
 import Folder from "./Folder";
-import { FileDB } from "../../types/folder.types";
+import { FileDB } from "../types/folder.types";
 
 class Supabase {
   static async removeFile(

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import User from "../prisma/queries/User";
+import User from "../queries/User";
 
 export const test = async (
   req: Request,

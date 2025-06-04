@@ -8,7 +8,6 @@ import authRouter from "./routes/authRouter";
 import userRouter from "./routes/userRouter";
 import fileRouter from "./routes/fileRouter";
 import folderRouter from "./routes/folderRouter";
-
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

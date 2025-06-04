@@ -1,6 +1,6 @@
-import File from "../prisma/queries/File";
-import supabase from "../config/supabase";
-import Supabase from "../prisma/queries/Supabase";
+import File from "../queries/File";
+import supabase from "src/config/supabase";
+import Supabase from "../queries/Supabase";
 import { Request, Response } from "express";
 import { FileCore } from "../types/controller.types";
 
