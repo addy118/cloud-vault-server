@@ -1,5 +1,5 @@
-// @ts-expect-error TS(2451): Cannot redeclare block-scoped variable 'db'.
-const db = require("../config/prismaClient");
+import db from "../config/prismaClient";
+import { UserDB } from "./queries/user.types";
 
 const users = [
   // the password is Hello@18
@@ -75,23 +75,18 @@ const users = [
   },
 ];
 
-// @ts-expect-error TS(2339): Property 'forEach' does not exist on type '{}'.
-users.forEach(async (user: any, i: any) => {
+users.forEach(async (user, i: number): Promise<void | undefined> => {
   // await db.user.deleteMany();
-
-  const res = await db.user.create({
+  const res: UserDB = await db.user.create({
     data: {
       name: user.name,
       username: user.username,
       email: user.email,
-      // // phone: user.phone,
       password: user.password,
     },
   });
 
-  // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
   console.log(res);
 });
 
-// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = users;
+export default users;

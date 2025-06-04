@@ -1,89 +1,67 @@
+import { NextFunction, Request, Response } from "express";
+import Folder from "../prisma/queries/Folder";
+import Supabase from "../prisma/queries/Supabase";
+import { AppError, FolderRes, MsgBody, MsgRes } from "./controller.types";
+import { CompleteFolder } from "prisma/queries/folder.types";
 
-const Folder = require("../prisma/queries/Folder");
-
-const Supabase = require("../prisma/queries/Supabase");
-
-
-exports.getFolder = async (req: any, res: any, next: any) => {
+exports.getFolder = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): FolderRes => {
   const { folderId } = req.params;
-
-  
   const folderDetails = await Folder.getItemsById(Number(folderId));
-  
 
   if (!folderDetails) {
-    
-    const err = new Error("Folder Not Found");
+    const err: AppError = new Error("Folder Not Found");
     err.status = 404;
-    return next(err);
+    next(err);
   }
 
-  res.json(folderDetails);
+  return res.json(folderDetails);
 };
 
-
-
-
-
-
-
-
-
-
-
-
-exports.postNewFolder = async (req: any, res: any) => {
+exports.postNewFolder = async (req: Request, res: Response): MsgRes => {
   try {
-    
     const { folderId } = req.params;
     const { folderName, userId } = req.body;
 
-    
     await Folder.create(folderName, Number(folderId), userId);
-    
-    res.json({ msg: "Folder created successfully!" });
+
+    return res.json({ msg: "Folder created successfully!" });
   } catch (error) {
-    
-    
-    res.status(400).json({ msg: error.message });
+    if (error instanceof Error) {
+      res.status(400).json({ msg: error.message });
+    }
   }
 };
 
-
-exports.postDeleteFolder = async (req: any, res: any) => {
-  
+exports.postDeleteFolder = async (req: Request, res: Response): MsgRes => {
   const folderId = Number(req.params.folderId);
-  
   const userId = Number(req.body);
 
-  
-
   try {
-    
     await Supabase.removeFolder(folderId, userId);
-
-    
     await Folder.deleteById(folderId);
 
-    
-    
-    res.json({ msg: "Folder deleted successfully!" });
-  } catch (err) {
-    
-    console.error("Error deleting the folder: ", err.message);
-    
-    console.error("Stack: ", err.stack);
-    res.status(500).json({ msg: "Failed to remove folder and its files." });
+    return res.json({ msg: "Folder deleted successfully!" });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error("Error deleting the folder: ", err.message);
+      console.error("Stack: ", err.stack);
+      return res
+        .status(500)
+        .json({ msg: "Failed to remove folder and its files." });
+    }
   }
 };
 
-
-exports.appError = (err: any, req: any, res: any, next: any) => {
-  
+exports.appError = (
+  err: AppError,
+  req: Request,
+  res: Response,
+  next: any,
+): Response<MsgBody> => {
   console.error(err.stack);
-  res.status(err.status || 500).render("customError", {
-    title: "Error",
-    file: "Folder Controller",
-    error: err.message,
-  });
+  return res.status(err.status || 500).json({ msg: err.message });
 };
