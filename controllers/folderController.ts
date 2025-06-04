@@ -4,7 +4,7 @@ import Supabase from "../prisma/queries/Supabase";
 import { AppError, FolderRes, MsgBody, MsgRes } from "./controller.types";
 import { CompleteFolder } from "prisma/queries/folder.types";
 
-exports.getFolder = async (
+export const getFolder = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -21,7 +21,7 @@ exports.getFolder = async (
   return res.json(folderDetails);
 };
 
-exports.postNewFolder = async (req: Request, res: Response): MsgRes => {
+export const postNewFolder = async (req: Request, res: Response): MsgRes => {
   try {
     const { folderId } = req.params;
     const { folderName, userId } = req.body;
@@ -36,7 +36,7 @@ exports.postNewFolder = async (req: Request, res: Response): MsgRes => {
   }
 };
 
-exports.postDeleteFolder = async (req: Request, res: Response): MsgRes => {
+export const postDeleteFolder = async (req: Request, res: Response): MsgRes => {
   const folderId = Number(req.params.folderId);
   const userId = Number(req.body);
 
@@ -56,7 +56,7 @@ exports.postDeleteFolder = async (req: Request, res: Response): MsgRes => {
   }
 };
 
-exports.appError = (
+export const appError = (
   err: AppError,
   req: Request,
   res: Response,

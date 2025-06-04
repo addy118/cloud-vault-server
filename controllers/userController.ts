@@ -8,7 +8,7 @@ import {
 import bcrypt from "bcrypt";
 import User from "../prisma/queries/User";
 
-exports.test = async (req: Request, res: Response): MsgRes => {
+export const test = async (req: Request, res: Response): MsgRes => {
   const { data } = req.body;
   try {
     const user = await User.get(data);
@@ -23,7 +23,7 @@ exports.test = async (req: Request, res: Response): MsgRes => {
   }
 };
 
-exports.testProtected = async (req: Request, res: Response): MsgRes => {
+export const testProtected = async (req: Request, res: Response): MsgRes => {
   const { userId } = req.params;
   try {
     const user = await User.getById(Number(userId));
@@ -38,7 +38,7 @@ exports.testProtected = async (req: Request, res: Response): MsgRes => {
   }
 };
 
-exports.getUser = async (req: Request, res: Response): CompleteUserRes => {
+export const getUser = async (req: Request, res: Response): CompleteUserRes => {
   const { userId } = req.params;
   try {
     const user = await User.getById(Number(userId));
@@ -53,7 +53,7 @@ exports.getUser = async (req: Request, res: Response): CompleteUserRes => {
   }
 };
 
-exports.getUserInfo = async (req: Request, res: Response): BaseUserRes => {
+export const getUserInfo = async (req: Request, res: Response): BaseUserRes => {
   const { userId } = req.params;
   try {
     const user = await User.getBasicInfo(Number(userId));
@@ -68,7 +68,7 @@ exports.getUserInfo = async (req: Request, res: Response): BaseUserRes => {
   }
 };
 
-exports.putUserName = async (req: Request, res: Response): MsgRes => {
+export const putUserName = async (req: Request, res: Response): MsgRes => {
   const { userId } = req.params;
   const { name } = req.body;
 
@@ -83,7 +83,7 @@ exports.putUserName = async (req: Request, res: Response): MsgRes => {
   }
 };
 
-exports.putUserEmail = async (req: Request, res: Response): MsgRes => {
+export const putUserEmail = async (req: Request, res: Response): MsgRes => {
   const { userId } = req.params;
   const { email } = req.body;
 
@@ -98,7 +98,7 @@ exports.putUserEmail = async (req: Request, res: Response): MsgRes => {
   }
 };
 
-exports.putUserUserName = async (req: Request, res: Response): MsgRes => {
+export const putUserUserName = async (req: Request, res: Response): MsgRes => {
   const { userId } = req.params;
   const { username } = req.body;
 
@@ -113,7 +113,7 @@ exports.putUserUserName = async (req: Request, res: Response): MsgRes => {
   }
 };
 
-exports.putUserPass = async (req: AuthRequest, res: Response): MsgRes => {
+export const putUserPass = async (req: AuthRequest, res: Response): MsgRes => {
   const { userId } = req.params;
   const { oldPass, newPass } = req.body;
 
@@ -133,7 +133,7 @@ exports.putUserPass = async (req: AuthRequest, res: Response): MsgRes => {
   }
 };
 
-exports.delUser = async (req: AuthRequest, res: Response): MsgRes => {
+export const delUser = async (req: AuthRequest, res: Response): MsgRes => {
   try {
     await User.delete(req.user.id);
     return res.status(204).json({ msg: "User deleted successfully" });

@@ -1,18 +1,13 @@
-
-const { Router } = require("express");
-const {
+import { Router } from "express";
+import {
   postSignup,
   postLogin,
   getToken,
   refresh,
   postLogout,
-
-} = require("../controllers/authController");
-
-const { validateReq } = require("../config/validation/req");
-
-const { validateSignup, validateLogin } = require("../config/validation/user");
-
+} from "../controllers/authController";
+import { validateReq } from "../config/validation/req";
+import { validateSignup, validateLogin } from "../config/validation/user";
 const authRouter = Router();
 
 authRouter.get("/token", getToken);
@@ -24,9 +19,7 @@ authRouter.post("/login", [validateLogin, validateReq, postLogin]);
 authRouter.post("/logout", postLogout);
 
 authRouter.use((err: any, req: any, res: any, next: any) => {
-  
   console.error(err.message);
-  
   console.error(err.stack);
   res.send("Something broke in auth routes!");
 });
