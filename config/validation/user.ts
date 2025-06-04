@@ -1,6 +1,6 @@
-const { body } = require("express-validator");
+import { body } from "express-validator";
 
-exports.validateSignup = [
+const validateSignup = [
   body("name")
     .trim()
     .isLength({ min: 3, max: 20 })
@@ -36,7 +36,7 @@ exports.validateSignup = [
     ),
 ];
 
-exports.validateLogin = [
+const validateLogin = [
   body("data").trim(),
 
   body("password")
@@ -57,7 +57,7 @@ exports.validateLogin = [
     ),
 ];
 
-// exports.validateBio = [
+// const validateBio = [
 //   body("bio")
 //     .optional()
 //     .trim()
@@ -65,7 +65,7 @@ exports.validateLogin = [
 //     .withMessage("Bio must be at most 300 characters"),
 // ];
 
-exports.validateName = [
+const validateName = [
   body("name")
     .trim()
     .isLength({ min: 3, max: 20 })
@@ -74,14 +74,14 @@ exports.validateName = [
   // .withMessage("Name should only contain letters, numbers, and underscores!"),
 ];
 
-exports.validateEmail = [
+const validateEmail = [
   body("email")
     .trim()
     .isEmail()
     .withMessage("Please provide a valid email address!"),
 ];
 
-exports.validatePass = [
+const validatePass = [
   body("password")
     .trim()
     // .isLength({ min: 6 })
@@ -99,3 +99,11 @@ exports.validatePass = [
       "Password must contain at least one special character (@$!%*?&)"
     ),
 ];
+
+export {
+  validateSignup,
+  validateLogin,
+  validateName,
+  validateEmail,
+  validatePass,
+};

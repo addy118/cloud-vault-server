@@ -1,7 +1,12 @@
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 require("dotenv").config();
+// @ts-expect-error TS(2451): Cannot redeclare block-scoped variable 'bcrypt'.
 const bcrypt = require("bcryptjs");
+// @ts-expect-error TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 const jwt = require("jsonwebtoken");
+// @ts-expect-error TS(2451): Cannot redeclare block-scoped variable 'User'.
 const User = require("../prisma/queries/User");
+// @ts-expect-error TS(2451): Cannot redeclare block-scoped variable 'Folder'.
 const Folder = require("../prisma/queries/Folder");
 const {
   ACCESS_TOKEN,
@@ -10,9 +15,11 @@ const {
   SAME_SITE_DEV,
   SECURE_PROD,
   SAME_SITE_PROD,
+// @ts-expect-error TS(2580): Cannot find name 'process'. Do you need to install... Remove this comment to see the full error message
 } = process.env;
 
-exports.postSignup = async (req, res) => {
+// @ts-expect-error TS(2304): Cannot find name 'exports'.
+exports.postSignup = async (req: any, res: any) => {
   const { name, username, email, password } = req.body;
 
   try {
@@ -25,22 +32,26 @@ exports.postSignup = async (req, res) => {
       hashedPassword
     );
 
+    // @ts-expect-error TS(2304): Cannot find name 'Number'.
     const root = await Folder.createRoot(Number(user.id));
 
     res.status(200).json({ ...user, rootId: root.id });
   } catch (error) {
+    // @ts-expect-error TS(2571): Object is of type 'unknown'.
     if (error.code === "P2002") {
       return res.status(400).json({
         msg: "Email, Phone or Username already exists. Please choose a different one.",
       });
     }
+    // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
     console.error("Error during signup: ", error.stack);
     res.status(500).json({ msg: "Failed to create user. Please try again." });
   }
 };
 
 // TOGGLE PROD/DEV CONFIG
-exports.postLogin = async (req, res) => {
+// @ts-expect-error TS(2304): Cannot find name 'exports'.
+exports.postLogin = async (req: any, res: any) => {
   const { data, password } = req.body;
 
   try {
@@ -67,13 +78,15 @@ exports.postLogin = async (req, res) => {
     const decoded = jwt.verify(accessToken, ACCESS_TOKEN);
     return res.json({ msg: "Login Successful!", accessToken, user: decoded });
   } catch (error) {
+    // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
     console.error("Error during login: ", error.stack);
     res.status(500).json({ msg: "Login failed. Please try again." });
   }
 };
 
 // TOGGLE PROD/DEV CONFIG
-exports.postLogout = async (req, res) => {
+// @ts-expect-error TS(2304): Cannot find name 'exports'.
+exports.postLogout = async (req: any, res: any) => {
   try {
     res.clearCookie("refreshCookie", {
       httpOnly: true,
@@ -82,12 +95,14 @@ exports.postLogout = async (req, res) => {
     });
     res.status(200).json({ msg: "Logged out successfully" });
   } catch (error) {
+    // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
     console.error("Error during logout: ", error.stack);
     res.status(500).json({ msg: "Logout failed. Please try again." });
   }
 };
 
-exports.getToken = async (req, res) => {
+// @ts-expect-error TS(2304): Cannot find name 'exports'.
+exports.getToken = async (req: any, res: any) => {
   const bearerHeader = req.headers["authorization"];
   const accessToken = bearerHeader && bearerHeader.split(" ")[1];
   if (!accessToken)
@@ -97,12 +112,14 @@ exports.getToken = async (req, res) => {
     const decoded = jwt.verify(accessToken, ACCESS_TOKEN);
     return res.json({ accessToken, user: decoded });
   } catch (err) {
+    // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
     console.error("Error verifying token: ", err.stack);
     res.status(403).json({ msg: "Invalid or expired token" });
   }
 };
 
-exports.verifyToken = (req, res, next) => {
+// @ts-expect-error TS(2304): Cannot find name 'exports'.
+exports.verifyToken = (req: any, res: any, next: any) => {
   const bearerHeader = req.headers["authorization"];
   const accessToken = bearerHeader && bearerHeader.split(" ")[1];
   if (!accessToken) return res.status(500).send("Unauthorized access!");
@@ -112,12 +129,14 @@ exports.verifyToken = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (err) {
+    // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
     console.error("Error verifying access token: ", err.stack);
     res.status(403).json({ msg: "Invalid or expired token" });
   }
 };
 
-exports.refresh = async (req, res) => {
+// @ts-expect-error TS(2304): Cannot find name 'exports'.
+exports.refresh = async (req: any, res: any) => {
   const refreshCookie = req.cookies.refreshCookie;
 
   if (!refreshCookie) {
@@ -147,12 +166,15 @@ exports.refresh = async (req, res) => {
 
     res.json({ msg: "Tokens Regenerated", accessToken });
   } catch (error) {
+    // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
     console.error("Error refreshing token: ", error.stack);
     return res.status(403).json({ msg: "Invalid or expired refresh token" });
   }
 };
 
-exports.verifyOwnership = (req, res, next) => {
+// @ts-expect-error TS(2304): Cannot find name 'exports'.
+exports.verifyOwnership = (req: any, res: any, next: any) => {
+  // @ts-expect-error TS(2304): Cannot find name 'Number'.
   const userId = Number(req.params.userId);
   if (userId !== req.user.id) {
     return res.status(403).json({ msg: "You don't have access rights" });
@@ -161,7 +183,7 @@ exports.verifyOwnership = (req, res, next) => {
 };
 
 // ACCESS TOKEN CONFIG
-const generateTokens = (user) => {
+const generateTokens = (user: any) => {
   const accessToken = jwt.sign(
     {
       id: user.id,

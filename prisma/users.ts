@@ -1,3 +1,4 @@
+// @ts-expect-error TS(2451): Cannot redeclare block-scoped variable 'db'.
 const db = require("../config/prismaClient");
 
 const users = [
@@ -74,7 +75,8 @@ const users = [
   },
 ];
 
-users.forEach(async (user, i) => {
+// @ts-expect-error TS(2339): Property 'forEach' does not exist on type '{}'.
+users.forEach(async (user: any, i: any) => {
   // await db.user.deleteMany();
 
   const res = await db.user.create({
@@ -87,7 +89,9 @@ users.forEach(async (user, i) => {
     },
   });
 
+  // @ts-expect-error TS(2584): Cannot find name 'console'. Do you need to change ... Remove this comment to see the full error message
   console.log(res);
 });
 
+// @ts-expect-error TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = users;
